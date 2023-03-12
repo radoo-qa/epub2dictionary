@@ -8,3 +8,5 @@ This project is an application converts English eBook from ePub format to list o
 * User gets output as PDF file divided into chapters.
 
 The main goal is help people read book in english, even if they don't know English Language well.
+
+Thanks
