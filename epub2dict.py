@@ -3,6 +3,8 @@
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
+import xml.etree.ElementTree as ET
+
 
 epub_file_path = 'book.epub'
 
@@ -48,3 +50,39 @@ def book2dict(book, chapter_identifier='Chapter'):
             chapters_dict[idx+1] = content[chapters_idx[idx]:]
 
     return chapters_dict
+
+
+# task: get contents of a book, and then parse into a txt file by linking to chapters
+
+book = epub.read_epub(epub_file_path)
+output = []
+for item in book.get_items_of_type(ebooklib.ITEM_NAVIGATION):
+    output.append(item.get_content().decode('utf-8'))
+
+parsed_text = '\n'.join(output)
+
+
+
+
+"""
+def extract_navpoints(xml_string):
+    ns = {'ncx': 'http://www.daisy.org/z3986/2005/ncx/'}
+    root = ET.fromstring(xml_string)
+
+    navpoints = root.findall('.//ncx:navPoint', ns)
+    contents = {}
+
+    for navpoint in navpoints:
+        text = navpoint.find('ncx:navLabel/ncx:text', ns).text
+        content = navpoint.find('ncx:content', ns).attrib['src']
+        contents[text] = content
+
+    return contents
+
+"""
+
+
+root = ET.fromstring(parsed_text)
+
+for point in root.findall('navMap'):
+    print(point.text)
