@@ -1,6 +1,6 @@
 import re
 import string
-from book2dict import book2dict
+from dev_book2dict import book2dict
 import pattern
 from pattern.en import lexeme, lemma
 
