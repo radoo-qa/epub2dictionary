@@ -6,12 +6,9 @@ from pattern.en import lexeme, lemma
 
 
 re_word = re.compile(r'[\w]+')
-book_path = 'C:/Python/harry/book.txt'
 common_words_path = 'C:/Python/harry/common_1000.txt'
 
 def chapter2list(book_path):
-    # Save book to dict num_chapter:str
-    book_dict = book2dict(book_path)
 
     # Convert num_chapter:str to num_chapter:list
     new_dict = {}

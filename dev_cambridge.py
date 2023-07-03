@@ -25,7 +25,7 @@ def get_soup(word):
         return BeautifulSoup(response.content, "lxml")
     return False
 
-def scrap_word(word_dict)
+def scrap_word(word_dict):
     for chapter, words in word_dict.items():
         for word in words:
             soup = get_soup(word)
