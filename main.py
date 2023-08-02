@@ -22,6 +22,6 @@ content_without_duplicated = remove_duplicates(content_without_common)
 
 words_to_translate = {chose_chapter: content_without_duplicated[chose_chapter]}
 
-FILE = r'_temporary2.csv'
+FILE = r'_temporary.csv'
 df = translate_words(words_to_translate)
 df.to_csv(FILE)

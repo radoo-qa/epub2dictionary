@@ -16,35 +16,50 @@ HEADERS = {
 
 def get_soup(word):
     global response
+
     try:
         response = requests.get(f'https://dictionary.cambridge.org/dictionary/english-polish/{word}', headers=HEADERS,
                                 timeout=3)
-    except ConnectTimeout:
-        print('Request has timed out')
+        if len(response.url) > 59:
+            soup = BeautifulSoup(response.content, "lxml")
+            for i in soup.find_all(class_=["pr entry-body__el", "pr entry-body"]):
+                i.find(class_="pos dpos").string
+            return soup
+        return False
 
-    if len(response.url) > 59:
-        return BeautifulSoup(response.content, "lxml")
-    return False
+    except AttributeError:
+        print(f'{word} - AttributeError!')
+        return False
 
 
 def scrap_word(chapter, word, soup):
     new_row = {'chapter': chapter, 'word': word}
 
-    for i in soup.find_all(class_="pr entry-body__el"):
-        new_row['pronunciation'] = soup.find(class_="ipa dipa").string
+    if soup.find_all(class_="pr entry-body__el"):
+        entry_body = soup.find_all(class_="pr entry-body__el")
+    else:
+        entry_body = soup.find_all(class_="pr entry-body")
+
+    for i in entry_body:
+        translated_words = []
+        if soup.find(class_="ipa dipa"):
+            new_row['pronunciation'] = soup.find(class_="ipa dipa").text
+        else:
+            new_row['pronunciation'] = "NULL"
 
         part_of_speech = i.find(class_="pos dpos").string
 
-        translated_words = []
+        if i.find_all(class_="sense-block pr dsense", limit=2):
+            for td in i.find_all(class_="sense-block pr dsense", limit=2):
+                translated_words.append(td.find(class_="trans dtrans dtrans-se").text.strip())
 
-        for td in i.find_all(class_="trans dtrans dtrans-se", limit=2):
-            translated_words.append(td.text.strip())
-
-            if len(translated_words) > 1:
-                new_row[part_of_speech] = translated_words[0]
-                new_row[f"{part_of_speech}2"] = translated_words[1]
-            else:
-                new_row[part_of_speech] = translated_words[0]
+                if len(translated_words) > 1:
+                    new_row[part_of_speech] = translated_words[0]
+                    new_row[f"{part_of_speech}2"] = translated_words[1]
+                else:
+                    new_row[part_of_speech] = translated_words[0]
+        else:
+            new_row[soup.find(class_="pos dpos").string] = soup.find(class_="trans dtrans dtrans-se").text.strip()
 
     return pd.Series(new_row)
 
