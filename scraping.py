@@ -41,25 +41,17 @@ def scrap_word(chapter, word, soup):
         entry_body = soup.find_all(class_="pr entry-body")
 
     for i in entry_body:
-        translated_words = []
         if soup.find(class_="ipa dipa"):
             new_row['pronunciation'] = soup.find(class_="ipa dipa").text
         else:
-            new_row['pronunciation'] = "NULL"
+            new_row['pronunciation'] = "NaN"
 
-        part_of_speech = i.find(class_="pos dpos").string
-
-        if i.find_all(class_="sense-block pr dsense", limit=2):
-            for td in i.find_all(class_="sense-block pr dsense", limit=2):
-                translated_words.append(td.find(class_="trans dtrans dtrans-se").text.strip())
-
-                if len(translated_words) > 1:
-                    new_row[part_of_speech] = translated_words[0]
-                    new_row[f"{part_of_speech}2"] = translated_words[1]
-                else:
-                    new_row[part_of_speech] = translated_words[0]
-        else:
-            new_row[soup.find(class_="pos dpos").string] = soup.find(class_="trans dtrans dtrans-se").text.strip()
+        for i in entry_body:
+            part_of_speech = i.find(class_="pos dpos").string
+            translated_words = [td.text.strip() for td in i.find_all(class_="trans dtrans dtrans-se", limit=2)]
+            translated_words = sum([i.split(',  ') for i in translated_words], [])
+            translated_words = set(translated_words)
+            new_row[i.find(class_="pos dpos").string] = [i for i in translated_words]
 
     return pd.Series(new_row)
 
@@ -69,11 +61,8 @@ def translate_words(word_dict):
                                'word',
                                'pronunciation',
                                'verb',
-                               'verb2',
                                'noun',
-                               'noun2',
-                               'adjective',
-                               'adjective2'])
+                               'adjective'])
 
     for chapter, words in word_dict.items():
         print(f"{len(words)} to check")

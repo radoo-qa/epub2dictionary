@@ -19,7 +19,6 @@ parsed_content_str = remove_markups(extracted_content_xml)
 content_words_list = chapters2list(parsed_content_str)
 content_without_common = remove_common(content_words_list, language_level)
 content_without_duplicated = remove_duplicates(content_without_common)
-
 words_to_translate = {chose_chapter: content_without_duplicated[chose_chapter]}
 
 FILE = r'_temporary.csv'
